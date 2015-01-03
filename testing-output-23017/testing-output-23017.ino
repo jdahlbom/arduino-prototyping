@@ -50,6 +50,6 @@ int computeUpdatedState() {
 void setOutput(int value) {
   Wire.beginTransmission(ADDRESS);
   Wire.write(GPIOA);        // select GPIOA register
-  Wire.write(value);  // Set all output HIGH in bank A
-  Wire.endTransmission();    // stop transmitting
+  Wire.write(value);        // Set output bits in bank A
+  Wire.endTransmission();   // stop transmitting
 }
