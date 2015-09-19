@@ -1,0 +1,40 @@
+Lähteet PCINT-toteutukselle Arduino Mega 2560 R3:lla:
+
+Sources:
+- Arduino Mega 2560 R3 schematic
+- https://www.arduino.cc/en/Main/arduinoBoardMega
+- http://www.atmel.com/Images/Atmel-2549-8-bit-AVR-Microcontroller-ATmega640-1280-1281-2560-2561_datasheet.pdf
+
+Additional helpful reading:
+- The best so far explanation of the PCINT: http://gammon.com.au/interrupts
+
+Requirements:
+- 8 rotary encoders, using 16 pin change interrupt pins, in pairs.
+- I2C pins must remain unused (20=SDA, 21=SCL), for other project needs.
+
+There are not enough external interrupt pins available in Arduino Mega,
+with only:
+- 2 (interrupt 0)
+- 3 (interrupt 1)
+- 18 (interrupt 5)
+- 19 (interrupt 4)
+- 20 (interrupt 3) (also used by I2C)
+- 21 (interrupt 2) (also used by I2C)
+
+We can use the pin change interrupt pins to get more interrupts,
+although for that we need to go directly to the microcontroller.
+Given the board configuration, it seems that out of the three interrupt
+groups (PCIE0, PCIE1, PCIE2) only 2 contain 8 pins, so we shall use those.
+
+Pin mapping from microcontroller to Arduino Mega
+
+PCIE2 group (Port K) PCINT23:16 pins map to analog pins A15:A8
+
+PCIE0 group (Port B) PCINT7:0 pins maps a bit differently:
+PCINT7:4 map to digital pins 13:10
+PCINT3 -> digital pin 50 (MISO)
+PCINT2 -> digital pin 51 (MOSI)
+PCINT1 -> digital pin 52 (SCK)
+PCINT0 -> digital pin 53 (SS)
+
+Using the pins 50-53 also means that SPI communication is not usable at the same time.
