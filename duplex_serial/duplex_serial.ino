@@ -12,6 +12,14 @@ const uint8_t openingChar = 's';
 const uint8_t msgTypeData = 1;
 const uint8_t msgTypeString = 2;
 
+const uint8_t signalPowerMax = 255;
+const uint8_t signalPowerMin = 0;
+const uint8_t txPowerMax = 122;
+const uint8_t txPowerMin = 65;
+const uint8_t txCoolantOffset = 100;
+const uint8_t txCoolantMin = 65;
+const uint8_t txCoolantMax = 122;
+
 char buffer[16];
 
 void pciSetup(byte pin)
@@ -108,11 +116,12 @@ void computeCoolants() {
 }
 
 uint8_t scaleCoolant(int8_t delta) {
-  return max(65, min(100 + delta, 122));
+  return max(txCoolantMin, min(txCoolantOffset + delta, txCoolantMax));
 }
 
-uint8_t scalePower(int8_t power) {
-  return max(65, min(power, 122));
+uint8_t scalePower(uint8_t power) {
+  uint8_t clampedPower = max(signalPowerMin, min(power, signalPowerMax));
+  return (uint8_t) ((double)(clampedPower - signalPowerMin)/(signalPowerMax-signalPowerMin)*(txPowerMax-txPowerMin)+txPowerMin);
 }
 
 void sendMessageHeader(uint8_t messageType, uint8_t messageLength) {
