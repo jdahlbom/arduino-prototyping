@@ -34,28 +34,32 @@ def print16bytes(data):
         print format(ord(val),"x") + " ",
     print ""
 
+def readSerialIn(buf):
+    if conn.inWaiting() > 0:
+        print str(conn.inWaiting()) + " bytes available"
+    bytesread = conn.read(conn.inWaiting())
+    buf.extend(bytesread)
+    print "Buffer length: "+ str(len(buf))
+    return buf
+
 def findMessageSeparator(buf):
     separatorFound = False
-    while not separatorFound:
-        if conn.inWaiting() > 0:
-            print str(conn.inWaiting()) + " bytes available"
-            bytesread = conn.read(conn.inWaiting())
-            buf.extend(bytesread)
-            try:
-                zeroindex = buf.index(chr(0))
-                buf = buf[zeroindex:]
-                if len(buf) > 1:
-                    if ord(buf[1]) is 0:
-                        separatorFound = True
+    while len(buf) > 1 and not separatorFound:
+        try:
+            zeroindex = buf.index(chr(0))
+            buf = buf[zeroindex:]
+            if len(buf) > 1:
+                if ord(buf[1]) is 0:
+                    separatorFound = True
+                else:
+                    print "Discarding first two bytes: " + str(ord(buf[0])) +", " + str(ord(buf[1]))
+                    if len(buf) > 2:
+                        buf = buf[2:]
                     else:
-                        print "Discarding first two bytes: " + str(ord(buf[0])) +", " + str(ord(buf[1]))
-                        if len(buf) > 2:
-                            buf = buf[2:]
-                        else:
-                            buf = []
-            except:
-                print "No zero bytes, discarded buffer"
-                return []
+                        buf = []
+        except:
+            print "No zero bytes, discarded buffer"
+            buf = []
     return buf
 
 def descaleCoolant(txCoolant):
@@ -111,7 +115,11 @@ def processMessage(buf):
 # Read TL + correct number of bytes for V until done.
 
 while True:
-    buf = findMessageSeparator(buf)
-    buf = processMessage(buf)
-    time.sleep(0.1)
+    buf = readSerialIn(buf)
+    while len(buf) > 1:
+        buf = findMessageSeparator(buf)
+        buf = processMessage(buf)
+        buf = readSerialIn(buf)
+        time.sleep(0.01)
+    time.sleep(0.05)
 
