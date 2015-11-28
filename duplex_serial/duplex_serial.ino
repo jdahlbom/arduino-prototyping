@@ -14,8 +14,8 @@ const uint8_t msgTypeString = 2;
 
 const uint8_t signalPowerMax = 255;
 const uint8_t signalPowerMin = 0;
-const uint8_t txPowerMax = 122;
-const uint8_t txPowerMin = 65;
+const uint8_t txPowerMax = 123;
+const uint8_t txPowerMin = 33;
 const uint8_t txCoolantOffset = 100;
 const uint8_t txCoolantMin = 65;
 const uint8_t txCoolantMax = 122;
@@ -48,7 +48,7 @@ RotaryEncoder encoderSetup(int pin0, int pin1) {
 void setup() {
   Serial.begin(9600);
   for (int i=0; i<8; ++i) {
-    powerLevels[i] = 100;
+    powerLevels[i] = (uint8_t)(100.0/300.0*255);
   }
   encoders[0] = encoderSetup(53,52);
   encoders[1] = encoderSetup(51,50);
@@ -98,10 +98,10 @@ ISR(PCINT2_vect)
   interruptChange(&encoders[7]);
 }
 
-// Should read from analog pin and map it to [0,255]
-uint8_t getPowerLevel(int sliderIndex) {
+// Should read from analog pin and map it to [0,100]
+float getPowerLevel(int sliderIndex) {
   powerLevels[sliderIndex] = powerLevels[sliderIndex] + coolantDelta[sliderIndex]*5;
-  return powerLevels[sliderIndex];
+  return scalePowerSignalToPercentage(powerLevels[sliderIndex]);
 }
 
 void computeCoolants() {
@@ -119,9 +119,12 @@ uint8_t scaleCoolant(int8_t delta) {
   return max(txCoolantMin, min(txCoolantOffset + delta, txCoolantMax));
 }
 
-uint8_t scalePower(uint8_t power) {
-  uint8_t clampedPower = max(signalPowerMin, min(power, signalPowerMax));
-  return (uint8_t) ((double)(clampedPower - signalPowerMin)/(signalPowerMax-signalPowerMin)*(txPowerMax-txPowerMin)+txPowerMin);
+float scalePowerSignalToPercentage(uint8_t powerSignal) {
+  return max(0.0f, min(100.0f, ((float)powerSignal) / 255.0f));
+}
+
+uint8_t scalePowerToTx(float powerPercentage) {
+  return (uint8_t) (powerPercentage * (txPowerMax-txPowerMin) + txPowerMin);
 }
 
 void sendMessageHeader(uint8_t messageType, uint8_t messageLength) {
@@ -136,7 +139,7 @@ void transmit() {
   sendMessageHeader(msgTypeData, 16);
   for (int i=0;i<8;++i) {
     //Power level should be read here as analogRead
-    Serial.write(scalePower(getPowerLevel(i))); 
+    Serial.write(scalePowerToTx(getPowerLevel(i))); 
   }
   for (int i=0;i<8;++i) {
     Serial.write(scaleCoolant(coolantDelta[i]));
