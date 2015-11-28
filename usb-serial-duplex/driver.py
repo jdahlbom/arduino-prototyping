@@ -8,8 +8,8 @@ baudrate = 9600
 TYPE_CONTROL = 1
 TYPE_STRING = 2
 
-TX_POWER_MAX = 122
-TX_POWER_MIN = 65
+TX_POWER_MAX = 123
+TX_POWER_MIN = 33
 GAME_POWER_MAX = 300
 GAME_POWER_MIN = 0
 
@@ -19,8 +19,6 @@ TX_COOLANE_DELTA_MIN = 65
 
 power = [100, 100, 100, 100, 100, 100, 100, 100]
 coolant = [0, 0, 0, 0, 0, 0, 0, 0]
-
-constant_data = ''.join(chr(x) for x in [0x71, 0x72, 0x73, 0x74, 0x75, 0x76,0x77,0x78,0x79,0x60,0x61,0x62,0x63,0x64,0x65,0x66])
 
 print "Using port: "+ port
 conn = serial.Serial(port, baudrate)
@@ -66,7 +64,7 @@ def descaleCoolant(txCoolant):
     return ord(txCoolant) - TX_COOLANT_DELTA_OFFSET
 
 def descalePower(txPower):
-    return ord(txPower)-TX_POWER_MIN/(TX_POWER_MAX-TX_POWER_MIN)*(GAME_POWER_MAX-GAME_POWER_MIN)+GAME_POWER_MIN
+    return float(ord(txPower)-TX_POWER_MIN)/(TX_POWER_MAX-TX_POWER_MIN)*(GAME_POWER_MAX-GAME_POWER_MIN)+GAME_POWER_MIN
 
 def handleControl(data):
     if len(data) is not 16:
