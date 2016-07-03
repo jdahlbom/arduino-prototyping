@@ -30,9 +30,9 @@ void setup() {
   writeBank(ADDRESS, IODIRA, 0x00);   // Set A pins as outputs
   writeBank(ADDRESS, IODIRB, 0xFF);   // Set B pins as inputs
   writeBank(ADDRESS, GPINTENB, 0xFF); // Enable interrupts for B pins
-  writeBank(ADDRESS, GPPUB, 0xFF);    // Set pull up resistors (100kohm) for B pins
+  writeBank(ADDRESS, GPPUB, 0x00);    // Set pull up resistors (100kohm) for B pins
   writeBank(ADDRESS, DEFVALB, 0xFF);  // Use HIGH as comparison value for all B pins
-  writeBank(ADDRESS, INTCONB, 0x00);  // Compare interrupt value against previous value */
+  writeBank(ADDRESS, INTCONB, 0xFF);  // Compare interrupt value against previous value */
   attachInterrupt(INTERRUPT_PIN_B, processBInterrupts, FALLING);
 }
 

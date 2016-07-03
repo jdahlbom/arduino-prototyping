@@ -12,6 +12,9 @@ Requirements:
 - 8 rotary encoders, using 16 pin change interrupt pins, in pairs.
 - I2C pins must remain unused (20=SDA, 21=SCL), for other project needs.
 
+Wiring:
+=======
+
 There are not enough external interrupt pins available in Arduino Mega,
 with only:
 - 2 (interrupt 0)
@@ -27,6 +30,7 @@ Given the board configuration, it seems that out of the three interrupt
 groups (PCIE0, PCIE1, PCIE2) only 2 contain 8 pins, so we shall use those.
 
 Pin mapping from microcontroller to Arduino Mega
+================================================
 
 PCIE2 group (Port K) PCINT23:16 pins map to analog pins A15:A8
 
@@ -38,3 +42,8 @@ PCINT1 -> digital pin 52 (SCK)
 PCINT0 -> digital pin 53 (SS)
 
 Using the pins 50-53 also means that SPI communication is not usable at the same time.
+
+Reading port K through analog pins:
+===================================
+// Lot of code lifted from: http://playground.arduino.cc/Main/PinChangeInterrupt
+
