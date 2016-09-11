@@ -1,0 +1,31 @@
+Artemis Engineering controller
+==============================
+
+- 8 controller segments with MCP23017 IO port expanders (for most, at least)
+  -- 16 leds controlled by IO port expander.
+  -- rotary encoder wired directly to Arduino interrupt pins.
+  -- Power control slider wired directly to Arduino analog pin.
+  -- Power input not through Arduino, because current limits are not enough.
+    -- Probably should add a current limiting fuse for each segment.
+- 2 arduino megas (or just 1?)
+  -- Internal communication between megas.
+- connect over I2C bus: With 2 megas, 6 controller segments can be connected to I2C.
+- 2 controller segments have to be wired directly to arduino megas 
+  -- which needs to be accounted for in the total current calculations.
+- Connect to PC via USB, needs a Windows driver.
+- Control Artemis via scraping python driver.
+- Backlighting of the control panel - some sort of voltage driven power switch?
+
+Isolated testable assets:
+- 16 -led controller segment control with MCP23017 IO expanders.  [DONE]
+- Rotary encoders via PCINT.  [DONE]
+- USB-driver.  [TODO]
+- USB-driver <-> Artemis driver  [TODO]
+
+
+USB-driver:
+- Debugging the Arduino output can be done by "screen /dev/tty.usbmodemID $BAUDRATE"
+
+
+Sources:
+- https://itp.nyu.edu/physcomp/labs/labs-serial-communication/two-way-duplex-serial-communication-using-an-arduino/
